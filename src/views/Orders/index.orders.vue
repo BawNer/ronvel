@@ -77,8 +77,8 @@
                 </v-list-item>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn outlined color="primary">Провести</v-btn>
-                  <v-btn outlined color="error">Отменить заказ</v-btn>
+                  <v-btn outlined color="primary" disabled>Провести</v-btn>
+                  <v-btn outlined color="error" disabled>Отменить заказ</v-btn>
                 </v-card-actions>
               </v-card>
             </v-col>
