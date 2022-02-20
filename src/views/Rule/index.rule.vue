@@ -233,7 +233,7 @@ export default {
       weightCategory: 0,
       logFile: null,
       loadLogFile: false,
-      loadLogFileMessage = 'Файл обрабатывается сервером',
+      loadLogFileMessage: 'Файл обрабатывается сервером',
       headers: [
         { text: 'id', align: 'center', value: 'id' },
         { text: 'Название', align: 'start', value: 'name' },

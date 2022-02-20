@@ -6,7 +6,7 @@
       <v-card-text>
         <v-form v-model="valid" ref="form">
           <v-text-field required v-model="login" :rules="[v => !!v || 'Логин не должен быть пустым']" label="Логин"></v-text-field>
-          <v-text-field required v-model="password" :rules="[v => !!v || 'Пароль не должен быть пустым']" label="Пароль"></v-text-field>
+          <v-text-field type="password" required v-model="password" :rules="[v => !!v || 'Пароль не должен быть пустым']" label="Пароль"></v-text-field>
           <span v-if="!auth" class="red--text">Логин/пароль введены неверно!</span>
         </v-form>
       </v-card-text>
