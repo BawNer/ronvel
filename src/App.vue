@@ -34,6 +34,48 @@
     </v-app-bar>
 
     <v-main>
+      <v-dialog
+        v-model="loadingNotificationState"
+        hide-overlay
+        persistent
+        width="300"
+      >
+        <v-card
+          color="primary"
+          dark
+        >
+          <v-card-text>
+            {{loadingNotificationMessage}}
+            <v-progress-linear
+              indeterminate
+              color="white"
+              class="mb-0"
+            ></v-progress-linear>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+      <v-dialog
+      v-model="systemNotification"
+      persistent
+      max-width="350"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Уведомление системы
+        </v-card-title>
+        <v-card-text>{{systemNotificationText}}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="systemNotification = false"
+          >
+            Ок
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
       <router-view/>
     </v-main>
   </v-app>
@@ -41,10 +83,15 @@
 
 <script>
 import cookie from './cookie'
+import bus from './bus'
 
 export default {
   name: 'App',
   data: () => ({
+    loadingNotificationState: false,
+    loadingNotificationMessage: '',
+    systemNotification: false,
+    systemNotificationText: ''
   }),
   computed: {
     user() {
@@ -52,6 +99,20 @@ export default {
     }
   },
   mounted() {
+    bus.$on('setLoadingNotification', message => {
+      this.loadingNotificationState = true
+      this.loadingNotificationMessage = message
+    })
+    bus.$on('killLoadingNotification', () => {
+      this.loadingNotificationState = false
+    })
+    bus.$on('closeSystemNotification', () => {
+      this.systemNotification = false
+    })
+    bus.$on('setSystemNotification', message => {
+      this.systemNotification = true
+      this.systemNotificationText = message
+    })
     const user = cookie.getCookie('user')
     if (user) {
       this.$store.dispatch('userLogin', true)
@@ -59,6 +120,7 @@ export default {
     } else {
       this.$store.dispatch('userLogin', false)
     }
+    this.$store.dispatch('getStateDeamon')
   }
 };
 </script>

@@ -12,26 +12,7 @@
               outlined
             ></v-file-input>
             <v-btn @click="sendFile" :disabled="!logFile" :loading="loadLogFile">Загрузить</v-btn>
-            <v-dialog
-              v-model="loadLogFile"
-              hide-overlay
-              persistent
-              width="300"
-            >
-              <v-card
-                color="primary"
-                dark
-              >
-                <v-card-text>
-                  {{loadLogFileMessage}}
-                  <v-progress-linear
-                    indeterminate
-                    color="white"
-                    class="mb-0"
-                  ></v-progress-linear>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
+
           </v-card-text>
         </v-card>
       </v-col>
@@ -82,17 +63,33 @@
                         >
                           <v-text-field
                             v-model="editedItemName"
+                            :hint="strictMode ? 'Название категории является фильтром': 'Название категории'"
                             label="Название категории"
                           ></v-text-field>
                           <v-text-field
+                            v-if="!strictMode"
                             v-model="ruleCategory"
-                            label="Правило фильтров"
-                            hint="Доступные фильтры: skins: [<>=] строка или число, region: = строка"
+                            label="Общие правила фильтров"
+                            hint="skins: [<>=] строка или число, region: = строка"
+                          ></v-text-field>
+                          <v-text-field
+                            v-model="ruleAccount"
+                            label="Правило фильтров для аккаунта"
+                            hint="ban := yes/no, valorantPt := 1-n"
                           ></v-text-field>
                           <v-text-field
                             v-model="weightCategory"
                             label="Вес категории"
+                            type="number"
                           ></v-text-field>
+                          <v-switch
+                            v-model="strictMode"
+                            label="режим строгого соответсвия"
+                          ></v-switch>
+                           <v-switch
+                            v-model="validateAccount"
+                            label="Проверять аккаунт в RIOT"
+                          ></v-switch>
                         </v-col>
                       </v-row>
                     </v-container>
@@ -144,6 +141,7 @@
                           <v-text-field
                             v-model="weightCategory"
                             label="Вес категории"
+                            type="number"
                           ></v-text-field>
                         </v-col>
                       </v-row>
@@ -219,6 +217,8 @@
 </template>
 
 <script>
+import bus from '../../bus'
+
 export default {
   name: 'Rule',
   data() {
@@ -233,7 +233,9 @@ export default {
       weightCategory: 0,
       logFile: null,
       loadLogFile: false,
-      loadLogFileMessage: 'Файл обрабатывается сервером',
+      strictMode: false,
+      ruleAccount: '',
+      validateAccount: true,
       headers: [
         { text: 'id', align: 'center', value: 'id' },
         { text: 'Название', align: 'start', value: 'name' },
@@ -259,15 +261,16 @@ export default {
   methods: {
     sendFile() {
       this.loadLogFile = true
+      bus.$emit('setLoadingNotification', 'Файл загружается в систему')
       const reader = new FileReader()
       reader.readAsText(this.logFile)
       reader.onload = () => {
         this.$store.dispatch('createAccount', JSON.stringify(reader.result)).then((res) => {
-          this.loadLogFileMessage = 'Файл загружается в MMOGA'
-          this.$store.dispatch('executeMmoga').then(() => {
-            this.loadLogFile = false
-            this.logFile = null
-          })
+          const accountLength = res.data.accounts.length
+          bus.$emit('killLoadingNotification')
+          bus.$emit('setSystemNotification', `Добвлено аккаунтов: ${accountLength}`)
+          this.loadLogFile = false
+          this.logFile = null
         })
       }
     },
@@ -277,38 +280,54 @@ export default {
       this.editedItemName = ''
       this.ruleCategory = ''
       this.weightCategory = 0
+      this.validateAccount = true
+      this.strictMode = false
+      this.ruleAccount = ''
       this.closeDelete()
     },
     closeDelete() {
       this.dialogDelete = false
     },
     async save() {
-      await this.$store.dispatch('createCategory', {
-        name: this.editedItemName, 
-        rule: this.ruleCategory, 
+      const payload = {
+        name: this.editedItemName,
+        rule: `${this.ruleAccount},validate:=${this.validateAccount},strictMode:=${this.strictMode},${this.ruleCategory}`,
         weight: this.weightCategory
-      })
+      }
+      await this.$store.dispatch('createCategory', payload)
       this.close()
     },
     async saveEdit() {
-      await this.$store.dispatch('updateCategory', { 
-        id: this.editedItemId, 
-        name: this.editedItemName, 
-        rule: this.ruleCategory, 
-        weight: this.weightCategory 
-      })
+      const payload = {
+        id: this.editedItemId,
+        name: this.editedItemName,
+        rule: this.ruleCategory,
+        weight: this.weightCategory
+      }
+      await this.$store.dispatch('updateCategory', payload)
       this.close()
     },
     editItem(item) {
       this.editItemDialog = true
       this.editedItemName = item.name
       this.editedItemId = item.id
+      this.weightCategory = item.weight 
       this.ruleCategory = item.rule
-      this.weightCategory = item.weight
     },
     deleteItem() {
       this.$store.dispatch('deleteCategory', {id: this.tmpDeleteItem})
       this.close()
+    },
+    makeObj(rules) {
+      rules = rules.split(',')
+      const obj = {}
+      rules.forEach(rule => {
+        const r = rule.split(':')
+        const key = r[0]
+        const value = r[1].split('').slice(1).join('')
+        obj[key] = value
+      })
+      return obj
     }
   },
   mounted() {

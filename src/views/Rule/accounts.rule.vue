@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row justify="center">
       <v-col cols="12" md="7">
-        <v-row>
+        <v-row v-if="accounts.length">
           <v-col cols="12" v-for="account in accounts" :key="account.id">
             <v-card>
               <v-subheader>
@@ -31,9 +31,14 @@
               </v-list-item>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn outlined color="error">Удалить</v-btn>
+                <v-btn outlined color="error" @click="deletAccount(account.id)">Удалить</v-btn>
               </v-card-actions>
             </v-card>
+          </v-col>
+        </v-row>
+        <v-row v-else justify="center">
+          <v-col md="7" cols="12">
+            <span class="text-h2">Аккаунтов нет</span>
           </v-col>
         </v-row>
       </v-col>
@@ -51,6 +56,11 @@ export default {
   computed: {
     accounts() {
       return this.$store.getters.getAccounts
+    }
+  },
+  methods: {
+    deletAccount(id) {
+      this.$store.dispatch('deleteAccount', id)
     }
   },
   beforeMount() {

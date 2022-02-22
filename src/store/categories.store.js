@@ -20,7 +20,12 @@ export default {
     },
     async createCategory(ctx, payload) {
       try {
-        await http.post('/categories', { category: { name: payload.name, rule: payload.rule.split(' ').join(''), weight: payload.weight } }, {
+        const category = {
+          name: payload.name,
+          rule: payload.rule.split(',').filter(c => c.length).join(','),
+          weight: payload.weight
+        }
+        await http.post('/categories', { category }, {
           headers: {
             'Authorization': `Token ${ctx.getters.getToken}`
           }
@@ -32,7 +37,12 @@ export default {
     },
     async updateCategory(ctx, payload) {
       try {
-        await http.put(`/categories/${payload.id}`, { category: { name: payload.name, rule: payload.rule.split(' ').join(''), weight: payload.weight } }, {
+        const category = {
+          name: payload.name,
+          rule: payload.rule.split(',').filter(c => c.length).join(','),
+          weight: payload.weight
+        }
+        await http.put(`/categories/${payload.id}`, { category }, {
           headers: {
             'Authorization': `Token ${ctx.getters.getToken}`
           }

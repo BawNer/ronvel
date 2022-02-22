@@ -11,18 +11,25 @@ export default {
   },
   actions: {
     async createAccount(ctx, logFile) {
-    await http.post('/account', { account: { log: logFile } }, {
+    return await http.post('/account', { account: { log: logFile } }, {
         headers: {
           'Authorization': `Token ${ctx.getters.getToken}`
         }
       })
     },
-    async executeMmoga() {
-      await axios.post('/mmoga/execute', {
-          headers: {
-            'Authorization': `Token ${ctx.getters.getToken}`
-          }
-        })
+    async executeMmoga(ctx) {
+      await http.post('/mmoga/orders/execute', null, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
+    async deleteAccount(ctx, id) {
+      await http.delete(`/account/${id}`, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      }).then(() => ctx.dispatch('findAccounts'))
     },
     async findAccounts(ctx) {
       await http.get('/accounts', {
