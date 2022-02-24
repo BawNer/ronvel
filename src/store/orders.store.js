@@ -58,8 +58,8 @@ export default {
         }
       ).then(() => {
         bus.$emit('setSystemNotification', 'Успех!')
-      }).catch(() => {
-        bus.$emit('setSystemNotification', 'Ошибка :(')
+      }).catch((err) => {
+        bus.$emit('setSystemNotification', 'Ошибка, возможно аккаунт не прошел валидацию...')
       })
     }
   },

@@ -34,19 +34,21 @@
       <v-select
         :items="accounts"
         item-value="id"
-        item-text="info.account.username"
+        :item-text="(account) => `${account.info.account.login}:${account.info.account.password}, ${account.info.account.region.index}, category: ${account.category.id}`"
         outlined
         dense
         label="Выберите аккаунт"
         v-model="accountId"
-      ></v-select>
+      >
+      </v-select>
       <v-spacer></v-spacer>
-      <v-btn outlined color="primary" @click="executeOrder" :disabled="!accountId">Провести</v-btn>
+      <v-btn outlined color="primary" @click="executeOrder" :disabled="!accountId" :loading="executing">Провести</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
+import bus from '../../bus'
 export default {
   name: 'orderComponent',
   props: [
@@ -57,11 +59,22 @@ export default {
   data() {
     return {
       accountId: null,
+      executing: false
+    }
+  },
+  computed: {
+    accountValue() {
+      return `id: ${this.accounts.id}, name: ${this.accounts.info.account.username}, login: ${this.accounts.info.account.login}`
     }
   },
   methods: {
-    executeOrder() {
-      this.$store.dispatch('executeOrderById', { orderId: this.order.id[0], accountId: this.accountId })
+    async executeOrder() {
+      bus.$emit('setLoadingNotification', 'Проведение заказа')
+      this.executing = !this.executing
+      await this.$store.dispatch('executeOrderById', { orderId: this.order.id[0], accountId: this.accountId })
+      bus.$emit('killLoadingNotification')
+      this.executing = !this.executing
+      this.$store.dispatch('findAccounts')
     }
   }
 }

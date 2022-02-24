@@ -38,7 +38,7 @@ export default {
   methods: {
     async signin() {
       this.isLoading = true
-      await axios.post('http://localhost:3000/users/login', {
+      await axios.post('http://localhost:3000/api/users/login', {
         user: {
           login: this.login,
           password: this.password

@@ -98,7 +98,7 @@ export default {
       return this.$store.getters.getCategories
     },
     accounts() {
-      return this.$store.getters.getAccounts
+      return this.$store.getters.getAccounts.filter(account => account.status == 'pending')
     }
   },
   methods: {
@@ -114,6 +114,7 @@ export default {
     this.$store.dispatch('findOrders').then(() => bus.$emit('killLoadingNotification'))
     this.$store.dispatch('findCategories')
     this.$store.dispatch('getStateDeamon')
+    this.$store.dispatch('findAccounts')
     this.mmogaDeamon = this.$store.getters.getDeamonState
   }
 }
