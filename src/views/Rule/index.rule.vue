@@ -51,6 +51,9 @@
                   </v-btn>
                 </template>
                 <v-card>
+                  <v-subheader class="red--text" v-if="strictMode">
+                    <span>Добавление аккунтов в категорию производится в ручном режиме</span>
+                  </v-subheader>
                   <v-card-title>
                     <span class="text-h5">Добавление категории</span>
                   </v-card-title>
@@ -73,6 +76,7 @@
                             hint="skins: [<>=] строка или число, region: = строка"
                           ></v-text-field>
                           <v-text-field
+                            v-if="!strictMode"
                             v-model="ruleAccount"
                             label="Правило фильтров для аккаунта"
                             hint="ban := yes/no, valorantPt := 1-n"

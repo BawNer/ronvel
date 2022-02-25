@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import axios from "axios"
+import http from '../http'
 import cookie from '../cookie'
 
 export default {
@@ -38,7 +38,7 @@ export default {
   methods: {
     async signin() {
       this.isLoading = true
-      await axios.post('http://localhost:3000/api/users/login', {
+      await http.post('/users/login', {
         user: {
           login: this.login,
           password: this.password
@@ -47,6 +47,7 @@ export default {
         cookie.setCookie('user', JSON.stringify({token: res.data.user.token}))
         this.$store.dispatch('userLogin', true)
         this.$store.dispatch('setToken', res.data.user.token)
+        this.$store.dispatch('getStateDeamon')
         this.auth = true
         this.$router.push('/')
       }).catch(err => {

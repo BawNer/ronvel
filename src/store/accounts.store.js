@@ -17,6 +17,13 @@ export default {
         }
       })
     },
+    async updateAccount(ctx, payload) {
+      return await http.put(`/account/${payload.id}`, { account: { categoryId: payload.categoryId, status: 'pending' } }, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
     async executeMmoga(ctx) {
       await http.post('/mmoga/orders/execute', null, {
         headers: {

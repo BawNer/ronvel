@@ -117,10 +117,11 @@ export default {
     if (user) {
       this.$store.dispatch('userLogin', true)
       this.$store.dispatch('setToken', user.token)
+      this.$store.dispatch('getStateDeamon')
+      this.$store.dispatch('findCategories')
     } else {
       this.$store.dispatch('userLogin', false)
     }
-    this.$store.dispatch('getStateDeamon')
   }
 };
 </script>
