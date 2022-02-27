@@ -17,6 +17,13 @@ export default {
         }
       })
     },
+    async createAccountWithCategory(ctx, payload) {
+      return await http.post(`/account/${payload.categoryId}`, { account: { log: payload.log } }, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
     async updateAccount(ctx, payload) {
       return await http.put(`/account/${payload.id}`, { account: { categoryId: payload.categoryId, status: 'pending' } }, {
         headers: {

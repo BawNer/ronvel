@@ -11,8 +11,28 @@
               label="Кликни чтоб загрузить файл"
               outlined
             ></v-file-input>
-            <v-btn @click="sendFile" :disabled="!logFile" :loading="loadLogFile">Загрузить</v-btn>
-
+            <v-list-item>
+              <v-list-item-content>
+                <v-btn v-if="!uploadOnlyCategory" @click="sendFile" :disabled="!logFile" :loading="loadLogFile">Загрузить</v-btn>
+                <v-btn v-else @click="sendFileWithCategory" :disabled="!logFile" :loading="loadLogFile">Загрузить в категорию</v-btn>
+              </v-list-item-content>
+              <v-list-item-content class="pl-4">
+                <v-checkbox
+                  v-model="uploadOnlyCategory"
+                  label="Загрузка в категорию"
+                ></v-checkbox>
+              </v-list-item-content>
+              <v-list-item-content>
+                <v-select
+                  v-model="categoryId"
+                  :disabled="!uploadOnlyCategory"
+                  label="Категория для загрузки аккаунтов"
+                  :items="categories"
+                  item-value="id"
+                  :item-text="category => `id: ${category.id}, name: ${category.name}`"
+                ></v-select>
+              </v-list-item-content>
+            </v-list-item>
           </v-card-text>
         </v-card>
       </v-col>
@@ -240,6 +260,8 @@ export default {
       strictMode: false,
       ruleAccount: '',
       validateAccount: true,
+      uploadOnlyCategory: false,
+      categoryId: 0,
       headers: [
         { text: 'id', align: 'center', value: 'id' },
         { text: 'Название', align: 'start', value: 'name' },
@@ -332,6 +354,29 @@ export default {
         obj[key] = value
       })
       return obj
+    },
+    sendFileWithCategory() {
+      this.loadLogFile = true
+      bus.$emit('setLoadingNotification', 'Файл загружается в систему')
+      const reader = new FileReader()
+      reader.readAsText(this.logFile)
+      reader.onload = () => {
+       this.$store.dispatch('createAccountWithCategory', {log: JSON.stringify(reader.result), categoryId: this.categoryId})
+       .then((res) => {
+          const accountLength = res.data.accounts.length
+          bus.$emit('killLoadingNotification')
+          bus.$emit('setSystemNotification', `Добвлено аккаунтов: ${accountLength}`)
+          this.loadLogFile = false
+          this.logFile = null
+          this.categoryId = 0
+        }).catch(err => {
+          bus.$emit('killLoadingNotification')
+          this.loadLogFile = false
+          this.logFile = null
+          this.categoryId = 0
+          bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
+        })
+      }
     }
   },
   mounted() {

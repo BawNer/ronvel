@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     accounts() {
-      return this.$store.getters.getAccounts
+      return this.$store.getters.getAccounts.reverse()
     }
   },
   beforeMount() {
