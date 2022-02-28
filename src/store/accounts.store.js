@@ -59,6 +59,25 @@ export default {
   getters: {
     getAccounts(state) {
       return state.accounts
+    },
+    getAccountWithPagination(state) {
+      return (page) => {
+        const accounts = []
+          if (page > 1) {
+            for (let i = (page-1)*10; i < page*10; i++) {
+              if (state.accounts[i]) {
+                accounts.push(state.accounts[i])
+              }
+            }
+          } else if (page == 1) {
+            for (let i = 0; i < page*10; i++) {
+              if (state.accounts[i]) {
+                accounts.push(state.accounts[i])
+              }
+            }
+          }
+          return accounts.reverse()
+      }
     }
   }
 }

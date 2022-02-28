@@ -4,7 +4,7 @@ import bus from '../bus'
 export default {
   state: () => ({
     orders: [],
-    orderWorker: true
+    orderWorker: false
   }),
   mutations: {
     SET_ORDERS(state, payload) {

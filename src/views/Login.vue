@@ -43,11 +43,11 @@ export default {
           login: this.login,
           password: this.password
         }
-      }).then(res => {
+      }).then(async res => {
         cookie.setCookie('user', JSON.stringify({token: res.data.user.token}))
         this.$store.dispatch('userLogin', true)
         this.$store.dispatch('setToken', res.data.user.token)
-        this.$store.dispatch('getStateDeamon')
+        await this.$store.dispatch('getStateDeamon')
         this.auth = true
         this.$router.push('/')
       }).catch(err => {

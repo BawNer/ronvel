@@ -3,10 +3,18 @@
     <v-row justify="center">
       <v-col cols="12" md="7">
         <v-row v-if="accounts.length">
-          <v-col cols="12" v-for="account in accounts" :key="account.id">
-            <account
-              :account="account"
-            />
+          <v-col cols="12" v-for="(account, index) in accounts" :key="account.id">
+            <template v-if="index % 9 == 0">
+              <account
+                v-intersect.once="pushMore"
+                :account="account"
+              />
+            </template>
+            <template v-else>
+              <account
+                :account="account"
+              />
+            </template>
           </v-col>
         </v-row>
         <v-row v-else justify="center">
@@ -20,24 +28,33 @@
 </template>
 
 <script>
+import bus from '../../bus'
 import account from './account.component.vue'
 
 export default {
   name: 'accounts',
   data() {
     return {
+      page: 1,
+      accounts: []
     }
   },
   components: {
     account
   },
-  computed: {
-    accounts() {
-      return this.$store.getters.getAccounts.reverse()
+  methods: {
+    pushMore(entries, observer) {
+      this.page = this.page + 1
+      this.$store.getters.getAccountWithPagination(this.page).forEach(acc => this.accounts.push(acc))
     }
   },
   beforeMount() {
-    this.$store.dispatch('findAccounts')
+    this.$store.dispatch('findAccounts').then(() => {
+      this.$store.getters.getAccountWithPagination(this.page).forEach(acc => this.accounts.push(acc))
+    })
+    bus.$on('deleteAccount', id => {
+      this.accounts = this.accounts.filter(account => account.id !== id)
+    })
   }
 }
 </script>

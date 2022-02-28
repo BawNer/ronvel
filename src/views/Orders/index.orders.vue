@@ -105,8 +105,8 @@ export default {
     getOrdersByStatus(status) {
       this.$store.dispatch('findOrders', status)
     },
-    changeOrderWorkerState() {
-      this.$store.dispatch('changeStateDeamon', this.mmogaDeamon)
+    async changeOrderWorkerState() {
+      await this.$store.dispatch('changeStateDeamon', this.mmogaDeamon)
     }
   },
   mounted() {

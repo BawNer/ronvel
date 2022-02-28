@@ -317,7 +317,7 @@ export default {
     async save() {
       const payload = {
         name: this.editedItemName,
-        rule: `${this.ruleAccount},validate:=${this.validateAccount},strictMode:=${this.strictMode},${this.ruleCategory}`,
+        rule: `${this.ruleAccount},validate:${this.validateAccount},strictMode:${this.strictMode},${this.ruleCategory}`,
         weight: this.weightCategory
       }
       await this.$store.dispatch('createCategory', payload)
@@ -343,17 +343,6 @@ export default {
     deleteItem() {
       this.$store.dispatch('deleteCategory', {id: this.tmpDeleteItem})
       this.close()
-    },
-    makeObj(rules) {
-      rules = rules.split(',')
-      const obj = {}
-      rules.forEach(rule => {
-        const r = rule.split(':')
-        const key = r[0]
-        const value = r[1].split('').slice(1).join('')
-        obj[key] = value
-      })
-      return obj
     },
     sendFileWithCategory() {
       this.loadLogFile = true

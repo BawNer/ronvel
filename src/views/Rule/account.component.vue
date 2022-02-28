@@ -61,6 +61,7 @@ export default {
   methods: {
     deletAccount(id) {
       this.$store.dispatch('deleteAccount', id)
+      bus.$emit('deleteAccount', id)
     },
     async updateAccount(id) {
       bus.$emit('setLoadingNotification', 'Обновляю информацию')
