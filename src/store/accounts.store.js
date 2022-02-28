@@ -76,7 +76,7 @@ export default {
               }
             }
           }
-          return accounts.reverse()
+          return accounts
       }
     }
   }
