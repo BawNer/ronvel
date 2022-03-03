@@ -17,6 +17,27 @@ export default {
         }
       })
     },
+    async deleteAccountsBycategoryId(ctx, categoryId) {
+      return await http.delete(`/accounts/category/${categoryId}`, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
+    async deleteAccountsByStatus(ctx, status) {
+      return await http.delete(`/accounts/status/${status}`, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
+    async deleteAllAccounts(ctx) {
+      return await http.delete(`/accounts`, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
     async createAccountWithCategory(ctx, payload) {
       return await http.post(`/account/${payload.categoryId}`, { account: { log: payload.log } }, {
         headers: {

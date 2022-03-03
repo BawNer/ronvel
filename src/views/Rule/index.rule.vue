@@ -216,10 +216,18 @@
               </v-icon>
               <v-icon
                 small
+                class="mr-2"
                 color="error"
                 @click="tmpDeleteItem = item.id, dialogDelete = true"
               >
                 mdi-delete
+              </v-icon>
+              <v-icon
+                small
+                color="orange"
+                @click="deleteAccountsBycategoryId(item.id)"
+              >
+                mdi-account-remove
               </v-icon>
             </template>
             <template v-slot:item.rule="{item}">
@@ -366,6 +374,16 @@ export default {
           bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
         })
       }
+    },
+    deleteAccountsBycategoryId(categoryId) {
+      bus.$emit('setLoadingNotification', 'Удаляю аккаунты....')
+      this.$store.dispatch('deleteAccountsBycategoryId', categoryId).then(() => {
+        bus.$emit('killLoadingNotification')
+        bus.$emit('setSystemNotification', `Успех!`)
+      }).catch(err => {
+        bus.$emit('killLoadingNotification')
+        bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
+      })
     }
   },
   mounted() {
