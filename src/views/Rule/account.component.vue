@@ -1,11 +1,15 @@
 <template>
   <v-card>
-    <v-subheader>
+    <v-subheader v-if="account.info.game">
       <span class="text-caption">Игра: {{account.info.game}}, {{account.info.account.region.index}} </span>
+    </v-subheader>
+    <v-subheader v-else>
+      <span class="text-caption">Упрощенное добавление</span>
     </v-subheader>
     <v-list-item>
       <v-list-item-content>
-        <v-list-item-title>Username: {{account.info.account.username}}</v-list-item-title>
+        <v-list-item-title v-if="account.info.account.username">Username: {{account.info.account.username}}</v-list-item-title>
+        <v-list-item-title v-else>{{account.info.account.login}}:{{account.info.account.password}}</v-list-item-title>
         <v-list-item-subtitle>Статус: 
           <v-chip
             label
@@ -18,7 +22,7 @@
           <span v-if="account.category === null">не найдено</span>
           <span v-else>{{account.category.name}}</span>
         </v-list-item-subtitle>
-        <v-list-item-subtitle>
+        <v-list-item-subtitle v-if="account.info.account.lastMatch">
           Последний матч:
           <span>{{new Date(account.info.account.lastMatch).toLocaleString()}}</span>
         </v-list-item-subtitle>

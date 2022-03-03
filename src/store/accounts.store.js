@@ -45,6 +45,13 @@ export default {
         }
       })
     },
+    async createSimplifyAccounts(ctx, payload) {
+      return await http.post(`/accounts`, payload, {
+        headers: {
+          'Authorization': `Token ${ctx.getters.getToken}`
+        }
+      })
+    },
     async updateAccount(ctx, payload) {
       return await http.put(`/account/${payload.id}`, { account: { categoryId: payload.categoryId, status: 'pending' } }, {
         headers: {
@@ -79,7 +86,7 @@ export default {
   },
   getters: {
     getAccounts(state) {
-      return state.accounts
+      return state.accounts.reverse()
     },
     getAccountWithPagination(state) {
       return (page) => {
@@ -97,7 +104,7 @@ export default {
               }
             }
           }
-          return accounts
+          return accounts.reverse()
       }
     }
   }

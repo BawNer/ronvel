@@ -12,6 +12,13 @@
               outlined
             ></v-file-input>
             <v-list-item>
+              <v-list-item-content class="pl-4">
+                <v-checkbox
+                  v-model="simplifyUpload"
+                  label="Урощенный файл"
+                  @change="uploadOnlyCategory = true"
+                ></v-checkbox>
+              </v-list-item-content>
               <v-list-item-content>
                 <v-btn v-if="!uploadOnlyCategory" @click="sendFile" :disabled="!logFile" :loading="loadLogFile">Загрузить</v-btn>
                 <v-btn v-else @click="sendFileWithCategory" :disabled="!logFile" :loading="loadLogFile">Загрузить в категорию</v-btn>
@@ -269,6 +276,7 @@ export default {
       ruleAccount: '',
       validateAccount: true,
       uploadOnlyCategory: false,
+      simplifyUpload: false,
       categoryId: 0,
       headers: [
         { text: 'id', align: 'center', value: 'id' },
@@ -357,23 +365,51 @@ export default {
       bus.$emit('setLoadingNotification', 'Файл загружается в систему')
       const reader = new FileReader()
       reader.readAsText(this.logFile)
-      reader.onload = () => {
-       this.$store.dispatch('createAccountWithCategory', {log: JSON.stringify(reader.result), categoryId: this.categoryId})
-       .then((res) => {
-          const accountLength = res.data.accounts.length
-          bus.$emit('killLoadingNotification')
-          bus.$emit('setSystemNotification', `Добвлено аккаунтов: ${accountLength}`)
-          this.loadLogFile = false
-          this.logFile = null
-          this.categoryId = 0
-        }).catch(err => {
-          bus.$emit('killLoadingNotification')
-          this.loadLogFile = false
-          this.logFile = null
-          this.categoryId = 0
-          bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
-        })
-      }
+      if (!this.simplifyUpload) {
+        reader.onload = () => {
+          this.$store.dispatch('createAccountWithCategory', {log: JSON.stringify(reader.result), categoryId: this.categoryId})
+          .then((res) => {
+              const accountLength = res.data.accounts.length
+              bus.$emit('killLoadingNotification')
+              bus.$emit('setSystemNotification', `Добвлено аккаунтов: ${accountLength}`)
+              this.loadLogFile = false
+              this.logFile = null
+              this.categoryId = 0
+            }).catch(err => {
+              bus.$emit('killLoadingNotification')
+              this.loadLogFile = false
+              this.logFile = null
+              this.categoryId = 0
+              bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
+            })
+          }
+      } else {
+        const info = []
+        reader.onload = () => {
+          reader.result.split('\n').filter(r => r.length).forEach(el => {
+            const tmp = el.split(':')
+            info.push({
+              login: tmp[0],
+              password: tmp[1]
+            })
+          })
+          this.$store.dispatch('createSimplifyAccounts', { accounts: { categoryId: this.categoryId, status: "pending", info: JSON.stringify(info) } }).then((res) => {
+              const accountLength = res.data.accounts.length
+              bus.$emit('killLoadingNotification')
+              bus.$emit('setSystemNotification', `Добвлено аккаунтов: ${accountLength}`)
+              this.loadLogFile = false
+              this.logFile = null
+              this.categoryId = 0
+            }).catch(err => {
+              bus.$emit('killLoadingNotification')
+              this.loadLogFile = false
+              this.logFile = null
+              this.categoryId = 0
+              bus.$emit('setSystemNotification', `Произошла ошибка: ${err}`)
+            })
+          }
+        }
+      
     },
     deleteAccountsBycategoryId(categoryId) {
       bus.$emit('setLoadingNotification', 'Удаляю аккаунты....')
