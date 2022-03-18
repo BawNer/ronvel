@@ -19,7 +19,7 @@
               <v-select
                 :items="categories"
                 item-value="id"
-                item-text="name"
+                :item-text="category => 'id: '+category.id+' name: '+category.name"
                 outlined
                 label="Веберите категорию"
                 v-model="activeCategory"
