@@ -46,7 +46,7 @@ export default {
           }
         }
       ).then(res => {
-        ctx.commit('SET_DEAMON_STATE', res.data)
+        ctx.commit('SET_DEAMON_STATE', res.data === 'true')
       })
     },
     async executeOrderById(ctx, payload) {
